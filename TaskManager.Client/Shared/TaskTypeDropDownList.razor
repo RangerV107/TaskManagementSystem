@@ -1,0 +1,44 @@
+﻿@using TaskManager.Client.Services
+@using TaskManager.API.DTO
+@inject TaskTypeService TTService
+
+<DropDownList dropDownText=@Text Items="tTypes" Context="type">
+    <ItemTemplate>
+        <a class="dropdown-item" @onclick="(()=>SelectTaskType(type))">@type.Name</a>
+    </ItemTemplate>
+</DropDownList>
+@*<p>ptId: @ptId</p>
+<p>PTId: @PTId</p>
+<p>@(PTId == Guid.Empty) </p>*@
+
+@code {
+
+    private Guid ptId { get; set; }
+    [Parameter]
+    public Guid PTId { get; set; }
+    [Parameter]
+    public EventCallback<Guid> PTIdChanged { get; set; }
+
+    HttpResponseMessage resp;
+    private List<TaskTypeDTO> tTypes;
+    string Text = "Choose task type";
+
+    protected override async Task OnInitializedAsync()
+    {
+        tTypes = await TTService.GetAllAsync();
+        if (PTId == Guid.Empty)
+            SelectTaskType(tTypes[0]);
+        else
+        {
+            TaskTypeDTO type = await TTService.GetOnIdAsync(PTId);
+            SelectTaskType(type);
+        }
+    }
+
+    protected void SelectTaskType(TaskTypeDTO type)
+    {
+        Text = type.Name;
+        ptId = type.Id;
+        PTIdChanged.InvokeAsync(ptId);
+    }
+}

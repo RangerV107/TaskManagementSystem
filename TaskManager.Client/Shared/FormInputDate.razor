@@ -1,0 +1,25 @@
+﻿
+<div class="form-group">
+    <label for="@(name)Input">@name</label>
+    <input type="date" class="form-control" id="@(name)Input" aria-describedby="@(name)InputHelp" value="@Date.ToString("yyyy-MM-dd")" @oninput="OnDateChanged">
+    @if (helper != "")
+    {
+        <small id="@(name)InputHelp" class="form-text text-muted">@(helper)</small>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public DateTime Date { get; set; }
+    [Parameter]
+    public EventCallback<DateTime> DateChanged { get; set; }
+    [Parameter]
+    public string name { get; set; }
+    [Parameter]
+    public string helper { get; set; }
+
+    private async Task OnDateChanged(ChangeEventArgs e)
+    {
+        await DateChanged.InvokeAsync(DateTime.Parse(e.Value.ToString()));
+    }
+}

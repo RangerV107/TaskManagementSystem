@@ -1,0 +1,55 @@
+﻿@page "/TaskTypes/ChangeTaskType/{id}"
+
+@using TaskManager.Client.Services
+@using TaskManager.API.DTO
+@inject TaskTypeService TTService
+
+
+<h1>Create task type</h1>
+
+<div class="container-fluid" style="padding: 0px">
+    <div class="row gx-1" style="padding: 5px">
+        <div class="col">
+            Task type title:
+            <input class="form-control" style="max-width: 300px" type="text" placeholder="taskTypeDTO.Name" @bind-value="taskTypeDTO.Name">
+        </div>
+    </div>
+    <div class="row gx-1" style="padding: 5px">
+        <div class="col">
+            Task type code:
+            <input class="form-control" style="max-width: 300px" type="text" placeholder="taskTypeDTO.Code" @bind-value="taskTypeDTO.Code">
+        </div>
+    </div>
+</div>
+
+
+<div class="container-fluid" style="padding: 0px">
+    <div class="row gx-1" style="padding: 5px">
+        <div class="col">
+            <HttpReqButton req="PUT" resp=resp butText="Change task type" successText="Changed successfully."/>
+        </div>
+    </div>
+    <div class="row gx-1" style="padding: 5px">
+        <div class="col">
+            <a href="/TaskTypes" class="btn btn-primary">Back to task types</a>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+    HttpResponseMessage resp;
+    TaskTypeDTO taskTypeDTO = new TaskTypeDTO();
+
+    protected override async Task OnInitializedAsync()
+    {
+        taskTypeDTO = await TTService.GetOnIdAsync(new Guid(id));
+    }
+
+    protected async Task PUT()
+    {
+        resp = await TTService.PutAsync(taskTypeDTO);
+    }
+}

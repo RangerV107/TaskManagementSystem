@@ -1,0 +1,65 @@
+﻿@page "/AWDirector/ProductionTasks/AcceptProductionTask/{id}"
+
+@using TaskManager.Client.Services
+@using TaskManager.API.DTO
+@inject ProductionTaskService PTService
+
+<h1>Accept production task</h1>
+
+<div class="container-fluid" style="padding: 0px">
+    <div class="row gx-1" style="padding: 5px">
+        <div class="col">
+
+            <form style="max-width: 400px">
+                <FormInputText type="text" @bind-Text="@productionTaskDTO.Title" name="Task title" placeholder="@productionTaskDTO.Title" />
+                <FormInputText type="text" @bind-Text="@productionTaskDTO.TaskContent" name="Task content" placeholder="@productionTaskDTO.TaskContent" />
+                <FormInputText type="text-area" @bind-Text="@productionTaskDTO.Notes" name="Notes" placeholder="@productionTaskDTO.Notes" />
+                @*<FormInputDate @bind-Date="@productionTaskDTO.InitDate" name="Init date" />*@
+                <div class="form-group">
+                    <label>Task type</label>
+                    <TaskTypeDropDownList @bind-PTId="@productionTaskDTO.TaskTypeId" />
+                </div>
+                <FormInputText type="text" @bind-Text="@ResponsibleExecutor.Name" name="Responsible executor name" />
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="container-fluid" style="padding: 0px">
+    <div class="row gx-1" style="padding: 5px">
+        <div class="col">
+            <HttpReqButton req="PUT" resp=resp butText="Accept task" successText="Accepted successfully." />
+        </div>
+    </div>
+    <div class="row gx-1" style="padding: 5px">
+        <div class="col">
+            <a href="/AWDirector" class="btn btn-primary">Back to tasks</a>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+    HttpResponseMessage resp;
+    ProductionTaskDTO productionTaskDTO = new ProductionTaskDTO();
+    PersonDTO ResponsibleExecutor = new PersonDTO();
+
+    protected override async Task OnInitializedAsync()
+    {
+        productionTaskDTO = await PTService.GetOnIdAsync(new Guid(id));
+        ResponsibleExecutor = productionTaskDTO.ResponsibleExecutor;
+    }
+
+    protected async Task PUT()
+    {
+        productionTaskDTO.InitDate = DateTime.Now;
+        productionTaskDTO.ResponsibleExecutor = ResponsibleExecutor;
+        resp = await PTService.PutAsync(productionTaskDTO);
+    }
+
+}
+

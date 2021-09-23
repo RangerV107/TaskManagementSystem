@@ -1,0 +1,85 @@
+﻿@page "/AWDirector"
+
+@using TaskManager.Client.Services
+@using TaskManager.API.DTO
+@inject ProductionTaskService PTService
+
+<h1>АРМ Руководитель</h1>
+
+<h3>Производственные задания</h3>
+<a href="/AWDirector/ProductionTasks/CreateProductionTask" class="btn btn-success">Создать производственное задание</a>
+<TableTemplate Items="pTasks" Context="task">
+    <TableHeader>
+        @*<th>ID</th>*@
+        <th>Заголовок</th>
+        <th>Содержание</th>
+        <th>Примечания </th>
+        <th>Дата инициации </th>
+        <th>Тип задания</th>
+        <th>Планируемая дата выполнения</th>
+        <th></th>
+        <th></th>
+        <th></th>
+    </TableHeader>
+    <RowTemplate>
+        @if (task.Title != "New task")
+        {
+            @*<td>@task.Id</td>*@
+            <td>@task.Title</td>
+            <td>@task.TaskContent</td>
+            <td>@task.Notes</td>
+            <td>@task.InitDate.ToShortDateString()</td>
+            <td>@task.TaskType.Name</td>
+            <td>@task.PlannedCompletionDate.ToShortDateString()</td>
+            <td><button class="btn btn-danger" @onclick="(() => Delete(task.Id))">Удалить</button></td>
+            <td><a href="/AWDirector/ProductionTasks/ChangeProductionTask/@task.Id" class="btn btn-primary">Измениить</a></td>
+            <td><a href="/AWDirector/ProductionTasks/ChangeProductionTask/@task.Id" class="btn btn-primary">Закончить отменить</a></td>
+        }
+    </RowTemplate>
+</TableTemplate>
+<p></p>
+
+<h3>Неинициализированные производственные задания</h3>
+<TableTemplate Items="pTasks" Context="task">
+    <TableHeader>
+        <th>Заголовок</th>
+        <th>Содержание</th>
+        <th>Примечания </th>
+        <th>Дата инициации </th>
+        <th>Тип задания</th>
+        <th>Планируемая дата выполнения</th>
+        <th></th>
+        <th></th>
+        <th></th>
+    </TableHeader>
+    <RowTemplate>
+        @if (task.Title == "New task")
+        {
+            @*<td>@task.Id</td>*@
+            <td>@task.Title</td>
+            <td>@task.TaskContent</td>
+            <td>@task.Notes</td>
+            <td>@task.InitDate.ToShortDateString()</td>
+            <td>@task.TaskType.Name</td>
+            <td>@task.PlannedCompletionDate.ToShortDateString()</td>
+            <td><button class="btn btn-danger" @onclick="(() => Delete(task.Id))">Удалить</button></td>
+            <td><a href="/AWDirector/ProductionTasks/ChangeProductionTask/@task.Id" class="btn btn-primary">Измениить</a></td>
+            <td><a href="/AWDirector/ProductionTasks/ChangeProductionTask/@task.Id" class="btn btn-primary">Закончить отменить</a></td>
+        }
+    </RowTemplate>
+</TableTemplate>
+
+@code {
+    private List<ProductionTaskDTO> pTasks;
+
+    protected override async Task OnInitializedAsync()
+    {
+        pTasks = await PTService.GetAllAsync();
+    }
+
+    protected async Task Delete(Guid id)
+    {
+        await PTService.DeleteAsync(id);
+        await OnInitializedAsync();
+    }
+}

@@ -1,0 +1,45 @@
+﻿@typeparam TItem
+
+@if (Items == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    if (Items.Count == 0)
+    {
+        <p>Table is empty.</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>@TableHeader</tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Items)
+                {
+                    @if (item != null)
+                    {
+                        <tr>@RowTemplate(item)</tr>
+                    }
+                    else
+                    {
+                        <tr>null</tr>
+                    }
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    [Parameter]
+    public RenderFragment TableHeader { get; set; }
+
+    [Parameter]
+    public RenderFragment<TItem> RowTemplate { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<TItem> Items { get; set; }
+}

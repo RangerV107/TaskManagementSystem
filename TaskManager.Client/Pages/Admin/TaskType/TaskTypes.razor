@@ -1,0 +1,44 @@
+﻿@page "/TaskTypes"
+
+@using TaskManager.Client.Services
+@using TaskManager.API.DTO
+@inject TaskTypeService TTService
+
+
+<h1>Task types</h1>
+
+<TableTemplate Items="tTypes" Context="type">
+    <TableHeader>
+        <th>Task type ID</th>
+        <th>Name</th>
+        <th>Code</th>
+        <th></th>
+        <th></th>
+    </TableHeader>
+    <RowTemplate>
+        <td>@type.Id</td>
+        <td>@type.Name</td>
+        <td>@type.Code</td>
+        <td><button class="btn btn-danger" @onclick="(()=>Delete(type.Id))">Delete</button></td>
+        <td><a href="/TaskTypes/ChangeTaskType/@type.Id" class="btn btn-primary">Change</a></td>
+    </RowTemplate>
+</TableTemplate>
+
+<a href="/TaskTypes/CreateTaskType" class="btn btn-success">Create task type</a>
+
+
+@code {
+    private List<TaskTypeDTO> tTypes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        tTypes = await TTService.GetAllAsync();
+    }
+
+    protected async Task Delete(Guid id)
+    {
+        await TTService.DeleteAsync(id);
+        await OnInitializedAsync();
+    }
+
+}

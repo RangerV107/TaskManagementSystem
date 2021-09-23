@@ -1,0 +1,50 @@
+﻿@page "/TaskTypes/CreateTaskType"
+
+@using TaskManager.Client.Services
+@using TaskManager.API.DTO
+@inject TaskTypeService TTService
+
+
+<h1>Create task type</h1>
+
+<div class="container-fluid" style="padding: 0px">
+    <div class="row gx-1" style="padding: 5px">
+        <div class="col">
+            Task type title:
+            <input class="form-control" style="max-width: 300px" type="text" placeholder="Task title" @bind-value="taskTypeDTO.Name">
+        </div>
+    </div>
+    <div class="row gx-1" style="padding: 5px">
+        <div class="col">
+            Task type code:
+            <input class="form-control" style="max-width: 300px" type="text" placeholder="Task content" @bind-value="taskTypeDTO.Code">
+        </div>
+    </div>
+</div>
+
+
+<div class="container-fluid" style="padding: 0px">
+    <div class="row gx-1" style="padding: 5px">
+        <div class="col">
+            <HttpReqButton req="POST" resp=resp butText="Create task type" successText="Created successful." />
+        </div>
+    </div>
+    <div class="row gx-1" style="padding: 5px">
+        <div class="col">
+            <a href="/TaskTypes" class="btn btn-primary">Back to task types</a>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    HttpResponseMessage resp;
+    TaskTypeDTO taskTypeDTO = new TaskTypeDTO();
+
+    protected async Task POST()
+    {
+        taskTypeDTO.Id = Guid.NewGuid();
+
+        resp = await TTService.PostAsync(taskTypeDTO);
+    }
+}

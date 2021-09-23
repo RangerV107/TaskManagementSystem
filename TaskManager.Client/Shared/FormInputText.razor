@@ -1,0 +1,68 @@
+﻿
+<div class="form-group">
+    <label for="@(name)Input">@name</label>
+    <div class="input-group">
+        @if (prepend != "")
+        {
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="@(name)Input">@prepend</span>
+            </div>
+        }
+        @switch (type)
+        {
+            case "text":
+                <input type="text" class="form-control" id="@(name)Input" aria-describedby="@(name)InputHelp" placeholder="@placeholder" value="@text" @oninput="OnTextChanged">
+                break;
+            case "text-area":
+                <textarea class="form-control" id="@(name)Input" rows="2" aria-describedby="@(name)InputHelp" placeholder="@placeholder" value="@text" @oninput="OnTextChanged"></textarea>
+                break;
+            default:
+                <p>Unknown @type.</p>
+                break;
+        }
+        @if (append != "")
+        {
+            <div class="input-group-append">
+                <span class="input-group-text" id="@(name)Input">@append</span>
+            </div>
+        }
+    </div>
+    @if (helper != "")
+    {
+        <small id="@(name)InputHelp" class="form-text text-muted">@(helper)</small>
+    }
+</div>
+
+@code {
+    private string text { get; set; }
+
+    [Parameter]
+    public string type { get; set; }
+    [Parameter]
+    public string Text { get; set; }
+    [Parameter]
+    public EventCallback<string> TextChanged { get; set; }
+    [Parameter]
+    public string name { get; set; }
+    [Parameter]
+    public string placeholder { get; set; } = "";
+    [Parameter]
+    public string helper { get; set; } = "";
+    [Parameter]
+    public string prepend { get; set; } = "";
+    [Parameter]
+    public string append { get; set; } = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (placeholder == "")
+            placeholder = name;
+    }
+
+    private async Task OnTextChanged(ChangeEventArgs e)
+    {
+        text = e.Value.ToString();
+        await TextChanged.InvokeAsync(text);
+    }
+
+}

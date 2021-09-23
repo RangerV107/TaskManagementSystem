@@ -1,0 +1,29 @@
+﻿@typeparam TItem
+
+@if (Items == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="dropdown">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            @dropDownText
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            @foreach (var item in Items)
+            {
+                @ItemTemplate(item)
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string dropDownText { get; set; }
+    [Parameter]
+    public IReadOnlyList<TItem> Items { get; set; }
+    [Parameter]
+    public RenderFragment<TItem> ItemTemplate { get; set; }
+}

@@ -1,0 +1,46 @@
+﻿@page "/AWOffice"
+
+@using TaskManager.Client.Services
+@using TaskManager.API.DTO
+@inject InDocumentService IDService
+
+<h1>AW Office</h1>
+<h3>In documents</h3>
+
+<TableTemplate Items="inDocs" Context="doc">
+    <TableHeader>
+        <th></th>
+        <th>Document ID</th>
+        <th>Name</th>
+        <th>Address</th>
+        <th>Email</th>
+        <th></th>
+        <th></th>
+    </TableHeader>
+    <RowTemplate>
+        <td><a href="/AWOffice/InDocuments/InDocumentInfo/@doc.Id" class="btn btn-primary">Info</a></td>
+        <td>@doc.Id</td>
+        <td>@doc.Name</td>
+        <td>@doc.Address</td>
+        <td>@doc.Email</td>
+        <td><button class="btn btn-danger" @onclick="(()=>Delete(doc.Id))">Delete</button></td>
+        <td><a href="/AWOffice/InDocuments/ChangeInDocument/@doc.Id" class="btn btn-primary disabled">Change</a></td>
+    </RowTemplate>
+</TableTemplate>
+
+<a href="/AWOffice/InDocuments/CreateInDocument" class="btn btn-success">Create document</a>
+
+@code {
+    private List<InDocumentDTO> inDocs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        inDocs = await IDService.GetAllAsync();
+    }
+
+    protected async Task Delete(Guid id)
+    {
+        await IDService.DeleteAsync(id);
+        await OnInitializedAsync();
+    }
+}

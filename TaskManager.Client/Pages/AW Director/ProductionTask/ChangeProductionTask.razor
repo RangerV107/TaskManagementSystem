@@ -1,0 +1,92 @@
+﻿@page "/AWDirector/ProductionTasks/ChangeProductionTask/{id}"
+
+@using TaskManager.Client.Services
+@using TaskManager.API.DTO
+@inject ProductionTaskService PTService
+
+<h1>Change production task</h1>
+
+<div class="container-fluid" style="padding: 0px">
+    <div class="row gx-1" style="padding: 5px">
+        <div class="col">
+
+            <div style="max-width: 400px">
+                <FormInputText type="text" @bind-Text="@productionTaskDTO.Title" name="Task title" placeholder="@productionTaskDTO.Title" />
+                <FormInputText type="text" @bind-Text="@productionTaskDTO.TaskContent" name="Task content" placeholder="@productionTaskDTO.TaskContent" />
+                <FormInputText type="text-area" @bind-Text="@productionTaskDTO.Notes" name="Notes" placeholder="@productionTaskDTO.Notes" />
+                <FormInputDate @bind-Date="@productionTaskDTO.InitDate" name="Init date" />
+                <div class="form-group">
+                    <label>Task type</label>
+                    <TaskTypeDropDownList @bind-PTId="@productionTaskDTO.TaskTypeId" />
+                </div>
+                <FormInputText type="text" @bind-Text="@ResponsibleExecutor.Name" name="Responsible executor name" />
+                <FormInputText type="text" @bind-Text="@docNameCompletionBasics" name="Document title" />
+                <button class="btn btn-outline-primary" @onclick="@AddCompletionBasics">Add document</button>
+                <TableTemplate Items="productionTaskDTO.CompletionBasics" Context="doc">
+                    <TableHeader>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th></th>
+                    </TableHeader>
+                    <RowTemplate>
+                        <td>@doc.DocumentId</td>
+                        <td>@doc.Title</td>
+                        <td><button class="btn btn-danger" @onclick="(() => { productionTaskDTO.CompletionBasics.Remove(doc); })">Delete</button></td>
+                    </RowTemplate>
+                </TableTemplate>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="container-fluid" style="padding: 0px">
+    <div class="row gx-1" style="padding: 5px">
+        <div class="col">
+            <HttpReqButton req="PUT" resp=resp butText="Change task" successText="Changed successfully."/>
+        </div>
+    </div>
+    <div class="row gx-1" style="padding: 5px">
+        <div class="col">
+            <a href="/AWDirector" class="btn btn-primary">Back to tasks</a>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+    HttpResponseMessage resp;
+    ProductionTaskDTO productionTaskDTO = new ProductionTaskDTO();
+    PersonDTO ResponsibleExecutor = new PersonDTO();
+    string docNameCompletionBasics = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        productionTaskDTO = await PTService.GetOnIdAsync(new Guid(id));
+        ResponsibleExecutor = productionTaskDTO.ResponsibleExecutor;
+        if(ResponsibleExecutor == null)
+        {
+            ResponsibleExecutor = new PersonDTO();
+        }
+    }
+
+    protected async Task PUT()
+    {
+        //productionTaskDTO.CompletionBasics = 
+        //productionTaskDTO.CancellationBasics =
+        productionTaskDTO.ResponsibleExecutor = ResponsibleExecutor;
+        resp = await PTService.PutAsync(productionTaskDTO);
+    }
+
+    protected void AddCompletionBasics()
+    {
+        DocumentDTO docDTO = new DocumentDTO();
+        docDTO.DocumentId = Guid.NewGuid();
+        docDTO.Title = docNameCompletionBasics;
+        productionTaskDTO.CompletionBasics.Add(docDTO);
+    }
+
+}

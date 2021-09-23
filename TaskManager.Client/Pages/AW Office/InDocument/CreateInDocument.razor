@@ -1,0 +1,74 @@
+﻿@page "/AWOffice/InDocuments/CreateInDocument"
+
+@using TaskManager.Client.Services
+@using TaskManager.API.DTO
+@inject InDocumentService IDService
+@inject ProductionTaskService PTService
+@inject TaskTypeService TTService
+
+<h1>Регистрация входящего отправления</h1>
+
+<div class="container-fluid" style="padding: 0px">
+    <div class="row gx-1" style="padding: 5px">
+        <div class="col">
+
+            <div style="max-width: 400px">
+                <FormInputText type="text" @bind-Text="@inDoc.Name" name="Имя" helper="Название организации или имя частного лица отправителя." />
+                <FormInputText type="text" @bind-Text="@inDoc.Address" name="Адрес" />
+                <FormInputText type="text" @bind-Text="@inDoc.Email" name="Адрес электронной почты" prepend="@("@")" />
+                <FormInputText type="text-area" @bind-Text="@inDoc.MessageText" name="Текст входящего сообщения" />
+                <FormInputDate @bind-Date="@inDoc.DeliveryDate" name="Дата доставки" />
+                <FormInputText type="text" @bind-Text="@inDoc.IncomingNumber" name="Входящий номер" />
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="container-fluid" style="padding: 0px">
+    <div class="row gx-1" style="padding: 5px">
+        <div class="col">
+            <HttpReqButton req="POST" resp=resp butText="Зарегестрировать" successText="Отправление зарегестрировано." />
+        </div>
+    </div>
+    <div class="row gx-1" style="padding: 5px">
+        <div class="col">
+            <a href="/AWOffice" class="btn btn-primary">Назад</a>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    HttpResponseMessage resp;
+    InDocumentDTO inDoc = new InDocumentDTO();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    protected async Task POST()
+    {
+        ProductionTaskDTO productionTaskDTO = new ProductionTaskDTO();
+        productionTaskDTO.Id = Guid.NewGuid();
+        productionTaskDTO.TaskTypeId = new List<TaskTypeDTO>(await TTService.GetAllAsync())[0].Id;
+        productionTaskDTO.Title = "New task";
+        productionTaskDTO.ResponsibleExecutor = new PersonDTO();
+        productionTaskDTO.ResponsibleExecutor.Name = "Name";
+        productionTaskDTO.ResponsibleExecutor.UserId = Guid.NewGuid();
+        HttpResponseMessage resp2 = await PTService.PostAsync(productionTaskDTO);
+        Console.WriteLine(resp2);
+
+        inDoc.Id = Guid.NewGuid();
+        inDoc.RegistrationDate = DateTime.Now;
+        inDoc.ProductionTaskId = productionTaskDTO.Id;
+
+        resp = await IDService.PostAsync(inDoc);
+        Console.WriteLine(resp);
+    }
+
+}
+

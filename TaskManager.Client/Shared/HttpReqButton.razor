@@ -1,0 +1,33 @@
+﻿@if (resp == null)
+{
+    <button class="btn btn-success" @onclick=req>@butText</button>
+}
+else
+{
+    @if (resp.StatusCode == System.Net.HttpStatusCode.OK)
+    {
+        <div class="text-success">
+            <div class="oi oi-check mr-2" aria-hidden="true"></div>
+            <strong>@successText</strong>
+        </div>
+    }
+    else
+    {
+        <div class="text-danger">
+            <span class="oi oi-x mr-2" aria-hidden="true"></span>
+            <strong>Error.</strong>
+        </div>
+        <p>@resp.ToString()</p>
+    }
+}
+
+@code {
+    [Parameter]
+    public EventCallback req { get; set; }
+    [Parameter]
+    public HttpResponseMessage resp { get; set; }
+    [Parameter]
+    public string butText { get; set; }
+    [Parameter]
+    public string successText { get; set; }
+}
